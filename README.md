@@ -49,10 +49,8 @@ make up
 ### Restore the database
 
 1. Download dump file at https://github.com/Azure/azure-postgresql/blob/master/samples/databases/wide-world-importers/wide_world_importers_pg.dump
-2. Spawn up the postgres container, notice that there's 5 users: admin, azure_pg_admin, azure_superuser, greglow, data_engineer (detail in file `./deployment/data/init_db.sh`)
-3. Shell to postgresql
-
-Copy dump file to container
+2. Spawn up the postgres container, notice that there's 5 users: admin, azure_pg_admin, azure_superuser, greglow, data_engineer. Detail visit file [init.db](./deployment/data/init_db.sh)
+3. Copy dump file to container
 
 ```bash
 docker cp ./wide_world_importers_pg.dump database:/backups/wide_world_importers_pg.dump
@@ -72,7 +70,9 @@ Then enter postgres's password and take a coffee.
 
 **Wide World Importers** (WWI) is a wholesale novelty goods importer and distributor operating from the San Francisco bay area.
 
-![](./media/wwi.jpeg)
+<p align="center">
+  <img src="./media/wwi.jpeg" />
+</p>
 
 As a wholesaler, WWI's customers are mostly companies who resell to individuals. WWI sells to retail customers across the United States including specialty stores, supermarkets, computing stores, tourist attraction shops, and some individuals. WWI also sells to other wholesalers via a network of agents who promote the products on WWI's behalf. While all of WWI's customers are currently based in the United States, the company is intending to push for expansion into other countries/regions.
 
@@ -149,3 +149,43 @@ Special-purpose schemas
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | Integration | Objects and procedures required for data warehouse integration (that is, migrating the data to the WideWorldImportersDW database). |
 | Sequences   | Holds sequences used by all tables in the application.                                                                             |
+
+## Data Warehouse
+
+The WideWorldImportersDW database is used for data warehousing and analytical processing. The transactional data about sales and purchases is generated in the WideWorldImporters database, and loaded into the WideWorldImportersDW database using a daily ELT/ELT process.
+
+The data in WideWorldImportersDW thus mirrors the data in WideWorldImporters, but the tables are organized differently. While WideWorldImporters has a traditional normalized schema, WideWorldImportersDW uses the [star schema](https://www.databricks.com/glossary/star-schema) approach for its table design. Besides the fact and dimension tables, the database includes a number of staging tables that are used in the ETL/ELT process.
+
+| Schema      | Description                                          |
+| ----------- | ---------------------------------------------------- |
+| Dimension   | Dimension tables.                                    |
+| Fact        | Fact tables.                                         |
+| Integration | Staging tables and other objects needed for ELT/ELT. |
+
+### Dimension tables
+
+WideWorldImportersDW has the following dimension tables. The description includes the relationship with the source tables in the WideWorldImporters database.
+
+| Table            | Name                 | Source tables                                                                                                      |
+| ---------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| City             | dim_city             | Application.Cities, Application.StateProvinces, Application.Countries                                              |
+| Customer         | dim_customer         | Sales.Customers, Sales.BuyingGroups, Sales.CustomerCategories                                                      |
+| Date             | dim_date             | New table with information about dates, including financial year (based on November 1st start for financial year). |
+| Employee         | dim_employee         | Application.People                                                                                                 |
+| Stock Item       | dim_stock_item       | Warehouse.StockItems, Warehouse.Colors, Warehouse.PackageType                                                      |
+| Supplier         | dim_supplier         | Purchasing.Suppliers, Purchasing.SupplierCategories                                                                |
+| Payment Method   | dim_payment_method   | Application.PaymentMethods                                                                                         |
+| Transaction Type | dim_transaction_type | Application.TransactionTypes                                                                                       |
+
+### Fact tables
+
+WideWorldImportersDW has the following fact tables. The description includes the relationship with the source tables in the WideWorldImporters database, as well as the classes of analytics/reporting queries each fact table is typically used with.
+
+| Table         | Name              | Source tables                                                  | Sample analytics                                                                                                                |
+| ------------- | ----------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Order         | fct_order         | Sales.Orders and Sales.OrderLines                              | Sales people, picker/packer productivity, and on time to pick orders. In addition, low stock situations leading to back orders. |
+| Sale          | fct_sale          | Sales.Invoices and Sales.InvoiceLines                          | Sales dates, delivery dates, profitability over time, profitability by sales person.                                            |
+| Purchase      | fct_purchase      | Purchasing.PurchaseOrderLines                                  | Expected vs actual lead times                                                                                                   |
+| Transaction   | fct_transaction   | Sales.CustomerTransactions and Purchasing.SupplierTransactions | Measuring issue dates vs finalization dates, and amounts.                                                                       |
+| Movement      | fct_movement      | Warehouse.StockTransactions                                    | Movements over time.                                                                                                            |
+| Stock Holding | fct_stock_holding | Warehouse.StockItemHoldings                                    | On-hand stock levels and value.                                                                                                 |
