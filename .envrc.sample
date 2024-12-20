@@ -1,0 +1,7 @@
+export PROJECT_NAME=wwi_data_platform
+
+# Can be development, production
+export ENV=
+
+# Source the .env file coresponding to the environment
+[ -f ".env.${ENV}" ] && dotenv ".env.${ENV}"
