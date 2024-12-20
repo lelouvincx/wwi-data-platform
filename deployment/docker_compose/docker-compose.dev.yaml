@@ -1,0 +1,46 @@
+name: "wwi_data_platform"
+
+services:
+  database:
+    image: postgres:14.15-alpine
+    container_name: database
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-wideworldimporters}
+      PG_DATA: /var/lib/postgresql/pgdata
+    volumes:
+      - pgdata:/var/lib/postgresql/pgdata
+      - backups:/backups
+      # This is the script that will be executed when the container starts
+      - ../data/init_db.sh:/docker-entrypoint-initdb.d/init_db.sh
+    networks:
+      - application_network
+    healthcheck:
+      test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  adminer:
+    image: adminer:standalone
+    container_name: "adminer"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
+    networks:
+      - application_network
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  backups:
+
+networks:
+  application_network:
+    driver: bridge
