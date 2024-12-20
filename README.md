@@ -66,11 +66,13 @@ docker exec database /bin/bash -c "pg_restore -h localhost -p 5432 -U postgres -
 
 Then enter postgres's password and take a coffee.
 
-## Data Catalog
+# Data Catalog
 
-### Dataset Overview
+## Dataset Overview
 
 **Wide World Importers** (WWI) is a wholesale novelty goods importer and distributor operating from the San Francisco bay area.
+
+![](./media/wwi.jpeg)
 
 As a wholesaler, WWI's customers are mostly companies who resell to individuals. WWI sells to retail customers across the United States including specialty stores, supermarkets, computing stores, tourist attraction shops, and some individuals. WWI also sells to other wholesalers via a network of agents who promote the products on WWI's behalf. While all of WWI's customers are currently based in the United States, the company is intending to push for expansion into other countries/regions.
 
@@ -78,7 +80,7 @@ WWI buys goods from suppliers including novelty and toy manufacturers, and other
 
 Recently WWI started to sell a variety of edible novelties such as chilly chocolates. The company previously didn't have to handle chilled items. Now, to meet food handling requirements, they must monitor the temperature in their chiller room and any of their trucks that have chiller sections.
 
-#### Workflow for warehouse stock items
+### Workflow for warehouse stock items
 
 The typical flow for how items are stocked and distributed is as follows:
 
@@ -93,13 +95,13 @@ The typical flow for how items are stocked and distributed is as follows:
 - Customers pay invoices to WWI.
 - Periodically, WWI pays suppliers for items that were on purchase orders. This is often sometime after they've received the goods.
 
-#### Data warehouse and analysis workflow
+### Data warehouse and analysis workflow
 
 While the team at WWI use SQL Server Reporting Services to generate operational reports from the WideWorldImporters database, they also need to perform analytics on their data and need to generate strategic reports. The team have created a dimensional data model in a database WideWorldImportersDW. This database is populated by an Integration Services package.
 
 SQL Server Analysis Services is used to create analytic data models from the data in the dimensional data model. SQL Server Reporting Services is used to generate strategic reports directly from the dimensional data model, and also from the analytic model. Power BI is used to create dashboards from the same data. The dashboards are used on websites, and on phones and tablets. Note: these data models and reports aren't yet available.
 
-#### Additional workflows
+### Additional workflows
 
 These are additional workflows.
 
@@ -108,6 +110,42 @@ These are additional workflows.
 - Cold room temperatures. Perishable goods are stored in refrigerated rooms. Sensor data from these rooms is ingested into the database for monitoring and analytics purposes.
 - Vehicle location tracking. Vehicles that transport goods for WWI include sensors that track the location. This location is again ingested into the database for monitoring and further analytics.
 
-#### Fiscal year
+### Fiscal year
 
 The company operates with a financial year that starts on November 1.
+
+## OLTP Database
+
+Visit: https://dbdocs.io/lelouvincx/WideWorldImporters
+
+### Data schemas
+
+These schemas contain the data. Many tables are needed by all other schemas and are located in the Application schema.
+
+| Schema      | Description                                                                                                                             |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Application | Application-wide users, contacts, and parameters. This schema also contains reference tables with data that is used by multiple schemas |
+| Purchasing  | Stock item purchases from suppliers and details about suppliers.                                                                        |
+| Sales       | Stock item sales to retail customers, and details about customers and sales people.                                                     |
+| Warehouse   | Stock item inventory and transactions.                                                                                                  |
+
+### Secure-access schemas
+
+These schemas are used for external applications that are not allowed to access the data tables directly. They contain views and stored procedures used by external applications.
+
+| Schema  | Description                                                                                                |
+| ------- | ---------------------------------------------------------------------------------------------------------- |
+| Website | All access to the database from the company website is through this schema.                                |
+| Reports | All access to the database from Reporting Services reports is through this schema.                         |
+| PowerBI | All access to the database from the Power BI dashboards via the Enterprise Gateway is through this schema. |
+
+The Reports and PowerBI schemas are not used in the initial release of the sample database. However, all Reporting Services and Power BI samples built on top of this database are encouraged to use these schemas.
+
+### Development schemas
+
+Special-purpose schemas
+
+| Schema      | Description                                                                                                                        |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Integration | Objects and procedures required for data warehouse integration (that is, migrating the data to the WideWorldImportersDW database). |
+| Sequences   | Holds sequences used by all tables in the application.                                                                             |
