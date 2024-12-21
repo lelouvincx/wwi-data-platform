@@ -9,20 +9,20 @@ This is my side project building a data platform with dataset WideWorldImporters
   - [x] Database catalog
 - [ ] Setup GCP BigQuery
 - [ ] Build Prefect Flow to push data from Postgres to BigQuery in raw layer
+- [ ] Data warehouse architecture and design
 - [ ] Build dbt project to transform data in raw layer to later layers
 - [ ] Register Holistics account and build dashboard
-- [ ] Continuous Integration with Github Actions
 
 ## Local development guide
 
-### Prequisites
+### 1. Prequisites
 
 - Python version >= 3.11 (3.11.10 recommended)
 - Docker with docker compose (at least 4 core and 4GB of RAM). [Installation guide](https://docs.docker.com/engine/install/)
 - uv 0.5.9 for python project management. [Installation guide](https://docs.astral.sh/uv/getting-started/installation/)
 - GCP Account. You can use free tier account. [Signup here](https://cloud.google.com/)
 
-### Install codebase
+### 2. Install codebase
 
 1. Clone the repository & go to the project location (/wwi-data-platform)
 
@@ -46,7 +46,7 @@ make up
 
 6. Visit [Makefile](./Makefile) to short-binding commands
 
-### Restore the database
+### 3. Restore the database
 
 1. Download dump file at https://github.com/Azure/azure-postgresql/blob/master/samples/databases/wide-world-importers/wide_world_importers_pg.dump
 2. Spawn up the postgres container, notice that there's 5 users: admin, azure_pg_admin, azure_superuser, greglow, data_engineer. Detail visit file [init.db](./deployment/data/init_db.sh)
@@ -80,7 +80,7 @@ WWI buys goods from suppliers including novelty and toy manufacturers, and other
 
 Recently WWI started to sell a variety of edible novelties such as chilly chocolates. The company previously didn't have to handle chilled items. Now, to meet food handling requirements, they must monitor the temperature in their chiller room and any of their trucks that have chiller sections.
 
-### Workflow for warehouse stock items
+### 1. Workflow for warehouse stock items
 
 The typical flow for how items are stocked and distributed is as follows:
 
@@ -95,13 +95,13 @@ The typical flow for how items are stocked and distributed is as follows:
 - Customers pay invoices to WWI.
 - Periodically, WWI pays suppliers for items that were on purchase orders. This is often sometime after they've received the goods.
 
-### Data warehouse and analysis workflow
+### 2. Data warehouse and analysis workflow
 
 While the team at WWI use SQL Server Reporting Services to generate operational reports from the WideWorldImporters database, they also need to perform analytics on their data and need to generate strategic reports. The team have created a dimensional data model in a database WideWorldImportersDW. This database is populated by an Integration Services package.
 
 SQL Server Analysis Services is used to create analytic data models from the data in the dimensional data model. SQL Server Reporting Services is used to generate strategic reports directly from the dimensional data model, and also from the analytic model. Power BI is used to create dashboards from the same data. The dashboards are used on websites, and on phones and tablets. Note: these data models and reports aren't yet available.
 
-### Additional workflows
+### 3. Additional workflows
 
 These are additional workflows.
 
@@ -110,7 +110,7 @@ These are additional workflows.
 - Cold room temperatures. Perishable goods are stored in refrigerated rooms. Sensor data from these rooms is ingested into the database for monitoring and analytics purposes.
 - Vehicle location tracking. Vehicles that transport goods for WWI include sensors that track the location. This location is again ingested into the database for monitoring and further analytics.
 
-### Fiscal year
+### 4. Fiscal year
 
 The company operates with a financial year that starts on November 1.
 
@@ -118,7 +118,7 @@ The company operates with a financial year that starts on November 1.
 
 Visit: https://dbdocs.io/lelouvincx/WideWorldImporters
 
-### Data schemas
+### 1. Data schemas
 
 These schemas contain the data. Many tables are needed by all other schemas and are located in the Application schema.
 
@@ -129,7 +129,7 @@ These schemas contain the data. Many tables are needed by all other schemas and 
 | Sales       | Stock item sales to retail customers, and details about customers and sales people.                                                     |
 | Warehouse   | Stock item inventory and transactions.                                                                                                  |
 
-### Secure-access schemas
+### 2. Secure-access schemas
 
 These schemas are used for external applications that are not allowed to access the data tables directly. They contain views and stored procedures used by external applications.
 
@@ -141,7 +141,7 @@ These schemas are used for external applications that are not allowed to access 
 
 The Reports and PowerBI schemas are not used in the initial release of the sample database. However, all Reporting Services and Power BI samples built on top of this database are encouraged to use these schemas.
 
-### Development schemas
+### 3. Development schemas
 
 Special-purpose schemas
 
@@ -162,7 +162,7 @@ The data in WideWorldImportersDW thus mirrors the data in WideWorldImporters, bu
 | Fact        | Fact tables.                                         |
 | Integration | Staging tables and other objects needed for ELT/ELT. |
 
-### Dimension tables
+### 1. Dimension tables
 
 WideWorldImportersDW has the following dimension tables. The description includes the relationship with the source tables in the WideWorldImporters database.
 
@@ -177,7 +177,7 @@ WideWorldImportersDW has the following dimension tables. The description include
 | Payment Method   | dim_payment_method   | Application.PaymentMethods                                                                                         |
 | Transaction Type | dim_transaction_type | Application.TransactionTypes                                                                                       |
 
-### Fact tables
+### 2. Fact tables
 
 WideWorldImportersDW has the following fact tables. The description includes the relationship with the source tables in the WideWorldImporters database, as well as the classes of analytics/reporting queries each fact table is typically used with.
 
