@@ -1,19 +1,26 @@
 [project]
 name = "wwi-data-platform"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-requires-python = ">=3.11"
+description = "Default template for PDM package"
+authors = [{ name = "lelouvincx", email = "dinhminhchinh3357@gmail.com" }]
 dependencies = [
-    "dbt-bigquery>=1.9.0",
-    "dbt-core>=1.9.1",
-    "dbt-extractor>=0.5.1",
-    "dlt>=1.5.0",
-    "prefect>=3.1.8",
-    "prefect-dbt>=0.6.4",
+  "prefect>=3.2.7",
+  "dbt-bigquery>=1.9.1",
+  "dbt-core>=1.9.2",
+  "prefect-dbt[bigquery]>=0.6.6",
+  "dlt>=1.7.0",
+  "dbt-extractor>=0.5.1",
 ]
+requires-python = "==3.11.*"
+readme = "README.md"
+license = { text = "MIT" }
 
-[dependency-groups]
+
+[project.optional-dependencies]
 dev = [
+    "pre-commit>=4.1.0",
+    "ruff>=0.9.7",
     "pytest>=8.3.4",
 ]
+[tool.pdm]
+distribution = false
