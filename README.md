@@ -2,24 +2,50 @@
 
 This is my side project building a data platform with dataset WideWorldImporters. Using prefect, dbt, bigquery, holistics.
 
+- [Project WideWorldImporters Data Platform](#project-wideworldimporters-data-platform)
+  - [Roadmap](#roadmap)
+    - [Progress updates](#progress-updates)
+  - [Local development guide](#local-development-guide)
+    - [1. Prequisites](#1-prequisites)
+    - [2. Install codebase](#2-install-codebase)
+    - [3. Restore the database](#3-restore-the-database)
+- [Data Catalog](#data-catalog)
+  - [Dataset Overview](#dataset-overview)
+    - [1. Workflow for warehouse stock items](#1-workflow-for-warehouse-stock-items)
+    - [2. Data warehouse and analysis workflow](#2-data-warehouse-and-analysis-workflow)
+    - [3. Additional workflows](#3-additional-workflows)
+    - [4. Fiscal year](#4-fiscal-year)
+  - [OLTP Database](#oltp-database)
+    - [1. Data schemas](#1-data-schemas)
+    - [2. Secure-access schemas](#2-secure-access-schemas)
+    - [3. Development schemas](#3-development-schemas)
+  - [Data Warehouse](#data-warehouse)
+    - [1. Dimension tables](#1-dimension-tables)
+    - [2. Fact tables](#2-fact-tables)
+
 ## Roadmap
 
-- [ ] Design architecture
 - [x] Initialize Postgres with dataset
   - [x] Database catalog
+- [ ] Design architecture
 - [ ] Setup GCP BigQuery
-- [ ] Build Prefect Flow to push data from Postgres to BigQuery in raw layer
+- [ ] Build Prefect flows to push data from Postgres to BigQuery into raw layer
+- [ ] Prefect deployment
 - [ ] Data warehouse architecture and design
 - [ ] Build dbt project to transform data in raw layer to later layers
 - [ ] Register Holistics account and build dashboard
+
+### Progress updates
+
+- Changed the package manager and installer from `uv` to `pdm`
 
 ## Local development guide
 
 ### 1. Prequisites
 
+- PDM version >= 2.22.3 [Installation guide](https://pdm-project.org/latest/#installation)
 - Python version >= 3.11 (3.11.10 recommended)
-- Docker with docker compose (at least 4 core and 4GB of RAM). [Installation guide](https://docs.docker.com/engine/install/)
-- uv 0.5.9 for python project management. [Installation guide](https://docs.astral.sh/uv/getting-started/installation/)
+- Docker with docker compose B2 (at least 2 core and 2GB of RAM). [Installation guide](https://docs.docker.com/engine/install/)
 - GCP Account. You can use free tier account. [Signup here](https://cloud.google.com/)
 
 ### 2. Install codebase
@@ -29,7 +55,7 @@ This is my side project building a data platform with dataset WideWorldImporters
 2. Install python dependencies
 
 ```bash
-uv sync --all-packages
+pdm sync --dev
 ```
 
 3. Build docker images
