@@ -4,7 +4,7 @@ This is my side project building a data platform with dataset WideWorldImporters
 
 - [Project WideWorldImporters Data Platform](#project-wideworldimporters-data-platform)
   - [Roadmap](#roadmap)
-    - [Progress updates](#progress-updates)
+  - [Progress updates](#progress-updates)
   - [Local development guide](#local-development-guide)
     - [1. Prequisites](#1-prequisites)
     - [2. Install codebase](#2-install-codebase)
@@ -41,7 +41,7 @@ This is my side project building a data platform with dataset WideWorldImporters
 - [ ] Build dbt project to transform data in raw layer to later layers
 - [ ] Register Holistics account and build dashboard
 
-### Progress updates
+## Progress updates
 
 - Changed the package manager and installer from `uv` to `pdm`
 
