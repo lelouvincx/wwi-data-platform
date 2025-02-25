@@ -1,8 +1,10 @@
 # Makefile for Docker Compose commands
+include .env
 
 # Variables
 DOCKER_COMPOSE ?= $(shell command -v docker-compose 2>/dev/null || echo docker compose)  # Allows overriding the docker-compose executable
 COMPOSE_FILE := deployment/docker_compose/docker-compose.dev.yaml
+PROJECT_NAME := wwi-data-platform
 YARN ?= yarn
 UV ?= uv
 

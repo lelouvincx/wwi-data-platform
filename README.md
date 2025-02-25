@@ -1,6 +1,6 @@
 # Project WideWorldImporters Data Platform
 
-This is my side project building a data platform with dataset WideWorldImporters. Using prefect, dbt, bigquery, holistics.
+This is my side project building a data platform with dataset WideWorldImporters. Using Prefect, dbt, BigQuery, Holistics.
 
 - [Project WideWorldImporters Data Platform](#project-wideworldimporters-data-platform)
   - [Roadmap](#roadmap)
@@ -9,6 +9,12 @@ This is my side project building a data platform with dataset WideWorldImporters
     - [1. Prequisites](#1-prequisites)
     - [2. Install codebase](#2-install-codebase)
     - [3. Restore the database](#3-restore-the-database)
+    - [4. Setup GCP BigQuery](#4-setup-gcp-bigquery)
+      - [4.1 Create a GCP Project](#41-create-a-gcp-project)
+      - [4.2 Enable the BigQuery API](#42-enable-the-bigquery-api)
+      - [4.3 Create Service Account Credentials](#43-create-service-account-credentials)
+      - [4.4 Configure Local Environment](#44-configure-local-environment)
+      - [4.5 Create BigQuery Datasets](#45-create-bigquery-datasets)
 - [Data Catalog](#data-catalog)
   - [Dataset Overview](#dataset-overview)
     - [1. Workflow for warehouse stock items](#1-workflow-for-warehouse-stock-items)
@@ -28,7 +34,7 @@ This is my side project building a data platform with dataset WideWorldImporters
 - [x] Initialize Postgres with dataset
   - [x] Database catalog
 - [ ] Design architecture
-- [ ] Setup GCP BigQuery
+- [x] Setup GCP BigQuery
 - [ ] Build Prefect flows to push data from Postgres to BigQuery into raw layer
 - [ ] Prefect deployment
 - [ ] Data warehouse architecture and design
@@ -47,10 +53,11 @@ This is my side project building a data platform with dataset WideWorldImporters
 - Python version >= 3.11 (3.11.10 recommended)
 - Docker with docker compose B2 (at least 2 core and 2GB of RAM). [Installation guide](https://docs.docker.com/engine/install/)
 - GCP Account. You can use free tier account. [Signup here](https://cloud.google.com/)
+- GCP CLI - `gcloud` [Installation guide](https://cloud.google.com/sdk/docs/install)
 
 ### 2. Install codebase
 
-1. Clone the repository & go to the project location (/wwi-data-platform)
+1. Clone the repository & go to the project location (`cd wwi-data-platform`)
 
 2. Install python dependencies
 
@@ -58,16 +65,26 @@ This is my side project building a data platform with dataset WideWorldImporters
 pdm sync --dev
 ```
 
-3. Build docker images
+3. Activate the virtual environment
 
 ```bash
-docker build -t data-generator:localdev -f .docker/build/app/Dockerfile .
+. .venv/bin/activate
+```
+
+From now, you can use `pdm` to manage python packages. The python executable is automatically installed and managed by pdm.
+
+4. Copy `.env.example` to `.env` and fill in the environment variables
+
+```bash
+cp .env.example .env
 ```
 
 5. Start docker services
 
 ```bash
 make up
+# Or use command
+docker compose -f deployment/docker_compose/docker-compose.dev.yaml -p wwi-data-platform up -d
 ```
 
 6. Visit [Makefile](./Makefile) to short-binding commands
@@ -75,7 +92,9 @@ make up
 ### 3. Restore the database
 
 1. Download dump file at https://github.com/Azure/azure-postgresql/blob/master/samples/databases/wide-world-importers/wide_world_importers_pg.dump
-2. Spawn up the postgres container, notice that there's 5 users: admin, azure_pg_admin, azure_superuser, greglow, data_engineer. Detail visit file [init.db](./deployment/data/init_db.sh)
+
+2. Spawn up the postgres container, notice that there's 5 users: `admin`, `azure_pg_admin`, `azure_superuser`, `greglow`, `data_engineer`. Detail visit file [init.db](./deployment/data/init_db.sh)
+
 3. Copy dump file to container
 
 ```bash
@@ -89,6 +108,98 @@ docker exec database /bin/bash -c "pg_restore -h localhost -p 5432 -U postgres -
 ```
 
 Then enter postgres's password and take a coffee.
+
+### 4. Setup GCP BigQuery
+
+#### 4.1 Create a GCP Project
+
+1. Sign in to your Google Cloud Console at [https://console.cloud.google.com/](https://console.cloud.google.com/)
+2. Click on the project dropdown at the top of the page
+3. Click on "New Project"
+4. Enter a project name (e.g., `wwi-data-platform`) and select an organization if applicable
+5. Click "Create"
+
+After creating the project, here's what the console looks like:
+
+![gcp-console](./media/gcp-console.jpeg)
+
+#### 4.2 Enable the BigQuery API
+
+1. Go to the [API Library](https://console.cloud.google.com/apis/library) in the Google Cloud Console
+2. Search for "BigQuery API"
+3. Click on "BigQuery API" in the results
+4. Click "Enable"
+
+![bigquery-api-enabled](./media/bigquery-api-enabled.png)
+
+#### 4.3 Create Service Account Credentials
+
+1. Navigate to "IAM & Admin" > "Service Accounts" from the sidebar
+2. Click "Create Service Account"
+3. Enter a service account name (e.g., `wwi-bigquery-sa`) and description
+4. Click "Create and Continue"
+5. Assign the following roles:
+   - BigQuery Admin
+   - BigQuery Data Editor
+   - BigQuery Job User
+6. Click "Continue" and then "Done"
+7. In the Service Accounts list, find your newly created service account
+8. Click the three dots in the Actions column and select "Manage keys"
+9. Click "Add Key" > "Create new key"
+10. Select JSON as the key type and click "Create"
+11. The key file will be automatically downloaded to your computer
+
+After having the key file, you should save it in a secure location. This key file will be used to authenticate your Python client to interact with BigQuery.
+
+> [!IMPORTANT]
+> Do not share or commit the key file.
+
+Authenticate with the created service account key:
+
+```bash
+gcloud auth activate-service-account --key-file=service-account-key.json
+```
+
+The console should show this:
+
+```bash
+Activated service account credentials for: [<service-account-email>]
+```
+
+#### 4.4 Configure Local Environment
+
+Add the following environment variables:
+
+```bash
+# GCP Configuration
+GOOGLE_APPLICATION_CREDENTIALS=/path/to/your/service-account-key.json
+GCP_PROJECT_ID=your-project-id
+```
+
+#### 4.5 Create BigQuery Datasets
+
+1. In the Google Cloud Console, navigate to BigQuery
+2. Click on your project ID in the Explorer panel
+3. Click "Create Dataset"
+4. Create the following datasets with the appropriate settings:
+
+   **Raw Layer**
+
+   - Dataset ID: `raw`
+   - Data location: Choose a region close to you (e.g., `us-central1`)
+   - Click "Create dataset"
+
+   **Staging Layer**
+
+   - Dataset ID: `staging`
+   - Data location: Same as raw layer
+   - Click "Create dataset"
+
+   **Analytics Layer**
+
+   - Dataset ID: `analytics`
+   - Data location: Same as raw layer
+   - Click "Create dataset"
 
 # Data Catalog
 
