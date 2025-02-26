@@ -1,8 +1,12 @@
 [project]
 name = "wwi-data-platform"
 version = "0.1.0"
-description = "Default template for PDM package"
+description = "Side project building a data platform with dataset WideWorldImporters. Using prefect, dbt, bigquery, holistics."
 authors = [{ name = "lelouvincx", email = "dinhminhchinh3357@gmail.com" }]
+requires-python = ">=3.11"
+readme = "README.md"
+license = { text = "MIT" }
+
 dependencies = [
   "prefect>=3.2.7",
   "dbt-bigquery>=1.9.1",
@@ -11,16 +15,6 @@ dependencies = [
   "dlt>=1.7.0",
   "dbt-extractor>=0.5.1",
 ]
-requires-python = "==3.11.*"
-readme = "README.md"
-license = { text = "MIT" }
 
-
-[project.optional-dependencies]
-dev = [
-    "pre-commit>=4.1.0",
-    "ruff>=0.9.7",
-    "pytest>=8.3.4",
-]
-[tool.pdm]
-distribution = false
+[dependency-groups]
+dev = ["pre-commit>=4.1.0", "pytest>=8.3.4", "ruff>=0.9.7"]

@@ -43,15 +43,13 @@ This is my side project building a data platform with dataset WideWorldImporters
 
 ## Progress updates
 
-- Changed the package manager and installer from `uv` to `pdm`
-
 ## Local development guide
 
 ### 1. Prequisites
 
-- PDM version >= 2.22.3 [Installation guide](https://pdm-project.org/latest/#installation)
+- UV version >= 0.6.2, [Installation guide](https://docs.astral.sh/uv/getting-started/installation/)
 - Python version >= 3.11 (3.11.10 recommended)
-- Docker with docker compose B2 (at least 2 core and 2GB of RAM). [Installation guide](https://docs.docker.com/engine/install/)
+- Docker with docker compose V2 (at least 2 core and 2GB of RAM). [Installation guide](https://docs.docker.com/engine/install/)
 - GCP Account. You can use free tier account. [Signup here](https://cloud.google.com/)
 - GCP CLI - `gcloud` [Installation guide](https://cloud.google.com/sdk/docs/install)
 
@@ -62,7 +60,7 @@ This is my side project building a data platform with dataset WideWorldImporters
 2. Install python dependencies
 
 ```bash
-pdm sync --dev
+uv sync --frozen --dev
 ```
 
 3. Activate the virtual environment
@@ -71,7 +69,7 @@ pdm sync --dev
 . .venv/bin/activate
 ```
 
-From now, you can use `pdm` to manage python packages. The python executable is automatically installed and managed by pdm.
+From now, you can use `uv` to manage python packages. The python executable is automatically installed and managed by uv.
 
 4. Copy `.env.example` to `.env` and fill in the environment variables
 

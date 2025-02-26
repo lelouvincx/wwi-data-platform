@@ -1,2 +1,2 @@
 python 3.11.10
-pdm    latest
+uv     0.6.2
