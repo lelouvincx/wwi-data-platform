@@ -14,6 +14,8 @@ dependencies = [
   "prefect-dbt[bigquery]>=0.6.6",
   "dlt>=1.7.0",
   "dbt-extractor>=0.5.1",
+  "psycopg2-binary>=2.9.10",
+  "asyncpg>=0.30.0",
 ]
 
 [dependency-groups]
