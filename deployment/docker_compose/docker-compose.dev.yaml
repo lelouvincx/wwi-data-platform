@@ -1,10 +1,12 @@
-name: "wwi_data_platform"
-
 services:
   database:
-    image: postgres:14.15-alpine
+    image: postgres:14-alpine
     container_name: database
+    hostname: database
+    platform: linux/amd64
     restart: always
+    expose:
+      - "5432"
     ports:
       - "5432:5432"
     environment:
@@ -12,35 +14,143 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
       POSTGRES_DB: ${POSTGRES_DB:-wideworldimporters}
       PG_DATA: /var/lib/postgresql/pgdata
+    env_file:
+      - ../../.env
     volumes:
-      - pgdata:/var/lib/postgresql/pgdata
+      - pgdata:/var/lib/postgresql/data
       - backups:/backups
-      # This is the script that will be executed when the container starts
-      - ../data/init_db.sh:/docker-entrypoint-initdb.d/init_db.sh
+      # INFO: This is the script that will be executed when the container starts
+      - ../database/init_db.sh:/docker-entrypoint-initdb.d/init_db.sh
     networks:
-      - application_network
+      - app_network
+      - data_network
     healthcheck:
       test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 3s
 
-  adminer:
-    image: adminer:standalone
-    container_name: "adminer"
+  prefect-server:
+    build:
+      context: ../../
+      dockerfile: Dockerfile
+    container_name: prefect-server
+    hostname: prefect-server
+    platform: linux/amd64
+    restart: on-failure
+    command: uv run prefect server start
+    expose:
+      - "4200"
     ports:
-      - "8081:8080"
+      - "4200:4200"
+    environment:
+      PREFECT_API_URL: http://0.0.0.0:4200/api
+      PREFECT_UI_URL: http://0.0.0.0:4200/api
+      PREFECT_SERVER_API_HOST: 0.0.0.0
+      PREFECT_LOGGING_LEVEL: DEBUG
+      PREFECT_API_DATABASE_DRIVER: postgresql+asyncpg
+      PREFECT_API_DATABASE_HOST: database
+      PREFECT_API_DATABASE_PORT: 5432
+      PREFECT_API_DATABASE_NAME: prefect
+      PREFECT_API_DATABASE_USER: ${POSTGRES_USER}
+      PREFECT_API_DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+    env_file:
+      - ../../.env
     depends_on:
       - database
     networks:
-      - application_network
-    restart: unless-stopped
+      - data_network
+    healthcheck:
+      test: curl --fail http://localhost:4200/api/ready
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  # Create a configurator service to create the work-pool and work-queue
+  prefect-configurator:
+    build:
+      context: ../../
+      dockerfile: Dockerfile
+    container_name: prefect-configurator
+    platform: linux/amd64
+    command: /app/setup.sh
+    environment:
+      PREFECT_API_URL: http://prefect-server:4200/api
+      PREFECT_LOGGING_LEVEL: DEBUG
+    depends_on:
+      prefect-server:
+        condition: service_healthy
+    networks:
+      - data_network
+
+  prefect-worker-default:
+    build:
+      context: ../../
+      dockerfile: Dockerfile
+    container_name: prefect-worker-default
+    hostname: prefect-worker-default
+    platform: linux/amd64
+    restart: on-failure
+    command: |
+      uv run prefect worker start --name "process-worker-default" --pool "process-work-pool" --work-queue "default" --type "process" --with-healthcheck
+    expose:
+      - "8080"
+    environment:
+      PREFECT_API_URL: http://prefect-server:4200/api
+      PREFECT_SERVER_API_HOST: 0.0.0.0
+      PREFECT_LOGGING_LEVEL: INFO
+      PREFECT_WORKER_WEBSERVER_PORT: 8080
+    env_file:
+      - ../../.env
+    depends_on:
+      prefect-server:
+        condition: service_healthy
+    networks:
+      - data_network
+    volumes:
+      - ../../pipelines/:/app/pipelines
+      - ../../dbt/:/app/dbt
+
+  prefect-worker-high:
+    build:
+      context: ../../
+      dockerfile: Dockerfile
+    container_name: prefect-worker-high
+    hostname: prefect-worker-high
+    platform: linux/amd64
+    restart: on-failure
+    command: |
+      uv run prefect worker start --name "process-worker-high" --pool "process-work-pool" --work-queue "high" --type "process" --with-healthcheck
+    expose:
+      - "8081"
+    environment:
+      PREFECT_API_URL: http://prefect-server:4200/api
+      PREFECT_SERVER_API_HOST: 0.0.0.0
+      PREFECT_LOGGING_LEVEL: INFO
+      PREFECT_WORKER_WEBSERVER_PORT: 8081
+    env_file:
+      - ../../.env
+    depends_on:
+      prefect-server:
+        condition: service_healthy
+    networks:
+      - data_network
+    volumes:
+      - ../../pipelines/:/app/pipelines
+      - ../../dbt/:/app/dbt
 
 volumes:
   pgdata:
   backups:
 
 networks:
-  application_network:
+  app_network:
     driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
+  data_network:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
