@@ -26,7 +26,7 @@ deployments:
       - github
     description: Retrieve the number of stars for a list of GitHub repositories
     schedule:
-      cron: "* * * * *" # every minute
+      cron: "*/5 * * * *" # every 5 minutes
     triggers: null
     entrypoint: pipelines.flows.serve_retrieve_github_stars:retrieve_github_stars
     parameters:
@@ -34,3 +34,18 @@ deployments:
     work_pool:
       name: process-work-pool
       work_queue_name: high
+
+  - name: greetings
+    version: "{{ get-commit-hash.stdout }}"
+    tags:
+      - greetings
+    description: Say hello to the world
+    schedule: # every minute
+    cron: "* * * * *"
+    triggers: null
+    entrypoint: pipelines.flows.say_hello:greetings
+    parameters:
+      names: ["Alice", "Bob", "Charlie"]
+    work_pool:
+      name: process-work-pool
+      work_queue_name: default

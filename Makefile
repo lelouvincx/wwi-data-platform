@@ -115,7 +115,7 @@ deploy:
   -v "./prefect.yaml:/app/prefect.yaml" \
   --platform linux/amd64 \
   wwi_data_platform-prefect-server:latest \
-  uv run prefect deploy
+  uv run prefect deploy --all
 
 help:  ## Show this help
 	@echo "Available commands:"
