@@ -5,6 +5,7 @@ include .env
 DOCKER_COMPOSE ?= $(shell command -v docker-compose 2>/dev/null || echo docker compose)  # Allows overriding the docker-compose executable
 COMPOSE_FILE := deployment/docker_compose/docker-compose.dev.yaml
 PROJECT_NAME := wwi_data_platform
+COMMAND ?= sh  # Command to run in the container, default is sh
 YARN ?= yarn
 UV ?= uv
 

@@ -26,7 +26,7 @@ deployments:
       - github
     description: Retrieve the number of stars for a list of GitHub repositories
     schedule:
-      cron: "*/5 * * * *" # every 5 minutes
+      cron: "0 * * * *"
     triggers: null
     entrypoint: pipelines.flows.serve_retrieve_github_stars:retrieve_github_stars
     parameters:
@@ -40,8 +40,8 @@ deployments:
     tags:
       - greetings
     description: Say hello to the world
-    schedule: # every minute
-      cron: "* * * * *"
+    schedule:
+      cron: "*/5 * * * *"
     triggers: null
     entrypoint: pipelines.flows.say_hello:greetings
     parameters:

@@ -31,17 +31,30 @@ This is my side project building a data platform with dataset WideWorldImporters
 
 ## Roadmap
 
+- [ ] Design architecture
 - [x] Initialize Postgres with dataset
   - [x] Database catalog
-- [ ] Design architecture
 - [x] Setup GCP BigQuery
-- [ ] Build Prefect flows to push data from Postgres to BigQuery into raw layer
 - [ ] Prefect deployment
+  - [x] Configure Prefect docker infrastructure
+  - [ ] Secret management
+  - [ ] Prefect deployment strategy
+- [ ] Build Prefect flows to push data from Postgres to BigQuery into raw layer
 - [ ] Data warehouse architecture and design
 - [ ] Build dbt project to transform data in raw layer to later layers
 - [ ] Register Holistics account and build dashboard
 
 ## Progress updates
+
+<details>
+  <summary><b>2025-03-03:</b> Configure Prefect docker infrastructure</summary>
+  <img src="https://pub-875fa80acf3e4df896d4aa004cc46db6.r2.dev/prefect-dashboard.png"/>
+  <video src="https://pub-875fa80acf3e4df896d4aa004cc46db6.r2.dev/prefect-docker-make-up.mp4"></video>
+</details>
+
+- **2025-25-02**: Setup GCP BigQuery
+
+- **2024-20-12**: Initialize the project
 
 ## Local development guide
 
