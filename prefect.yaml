@@ -41,7 +41,7 @@ deployments:
       - greetings
     description: Say hello to the world
     schedule: # every minute
-    cron: "* * * * *"
+      cron: "* * * * *"
     triggers: null
     entrypoint: pipelines.flows.say_hello:greetings
     parameters:

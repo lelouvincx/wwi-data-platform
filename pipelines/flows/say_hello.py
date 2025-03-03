@@ -1,12 +1,12 @@
 from prefect import flow, task
 
 
-@task
+@task(log_prints=True)
 def say_hello(name):
     print(f"hello {name}")
 
 
-@task
+@task(log_prints=True)
 def say_goodbye(name):
     print(f"goodbye {name}")
 
