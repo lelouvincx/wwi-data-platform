@@ -45,7 +45,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Copy the rest of the application code
 COPY pipelines/ /app/pipelines/
 COPY pyproject.toml uv.lock /app/
-COPY prefect.yaml /app/
+COPY prefect.yaml prefect.toml /app/
 
 # Sync the project with local packages
 RUN --mount=type=cache,target=/root/.cache/uv \

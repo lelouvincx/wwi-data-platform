@@ -1,3 +1,4 @@
+# Used to define the Prefect deployment configuration
 build:
   - prefect.deployments.steps.git_clone:
       id: clone-step

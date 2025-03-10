@@ -1,0 +1,31 @@
+# This is the configuration file for Prefect.
+# For more information on configuration, see: https://docs.prefect.io/v3/develop/settings-ref
+
+home = "/app/.prefect"
+ui_url = "http://127.0.0.1:4200"
+
+[server]
+metrics_enabled = false # whether or not to enable Prometheus metrics in the API
+
+[server.database]
+# driver = "postgresql+asyncpg" # equivalent to PREFECT_API_DATABASE_DRIVER
+# host = "127.0.0.1"            # equivalent to PREFECT_API_DATABASE_HOST
+# port = 5432                   # equivalent to PREFECT_API_DATABASE_PORT
+# name = "prefect"              # equivalent to PREFECT_API_DATABASE_NAME
+# user = "postgres"             # equivalent to PREFECT_API_DATABASE_USER
+# password = "password"         # equivalent to PREFECT_API_DATABASE_PASSWORD
+echo = false # if true, will log all SQL issued to the database
+
+[server.ephemeral]
+enabled = false # controls whether or not a subprocess server can be started when no API URL is provided
+
+[api]
+url = "http://127.0.0.1:4200/api"
+tls_insecure_skip_verify = false  # if true, disables SSL checking to allow insecure requests. Setting to False is recommended only during development
+
+[client]
+metrics.enabled = false # whether or not to enable Prometheus metrics in the client
+metrics.port = 4201     # the port to expose Prometheus metrics on
+
+[logging]
+log_prints = true # print statements in flows and tasks will be redirected to the Prefect logger for the given run
