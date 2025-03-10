@@ -1,6 +1,6 @@
 services:
   database:
-    image: postgres:14-alpine
+    image: postgres:17-alpine
     container_name: database
     hostname: database
     platform: linux/amd64
