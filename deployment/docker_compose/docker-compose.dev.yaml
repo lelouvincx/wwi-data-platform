@@ -143,6 +143,23 @@ services:
       - ../../pipelines/:/app/pipelines
       - ../../dbt/:/app/dbt
 
+  prometheus-prefect-exporter:
+    image: prefecthq/prometheus-prefect-exporter:latest
+    container_name: prometheus-prefect-exporter
+    platform: linux/amd64
+    restart: on-failure
+    expose:
+      - "8000"
+    ports:
+      - "8000:8000"
+    environment:
+      PREFECT_API_URL: http://prefect-server:4200/api
+    depends_on:
+      prefect-server:
+        condition: service_healthy
+    networks:
+      - data_network
+
 volumes:
   pgdata:
   backups:
