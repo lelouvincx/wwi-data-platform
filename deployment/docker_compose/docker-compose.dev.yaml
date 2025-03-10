@@ -5,7 +5,6 @@ services:
     hostname: database
     platform: linux/amd64
     restart: always
-    command: postgres -c 'config_file=/var/lib/postgresql/data/postgresql.conf'
     expose:
       - "5432"
     ports:
@@ -22,7 +21,6 @@ services:
       - backups:/backups
       # INFO: This is the script that will be executed when the container starts
       - ../database/init_db.sh:/docker-entrypoint-initdb.d/init_db.sh
-      - ../database/postgresql.conf:/var/lib/postgresql/data/postgresql.conf
     networks:
       - app_network
       - data_network
