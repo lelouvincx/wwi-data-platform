@@ -96,12 +96,7 @@ services:
     platform: linux/amd64
     restart: on-failure
     command: |
-      uv run prefect worker start \
-      --name "process-worker-default" \
-      --pool "process-work-pool" \
-      --work-queue "default" \
-      --type "process" \
-      --with-healthcheck
+      uv run prefect worker start --name "process-worker-default" --pool "process-work-pool" --work-queue "default" --type "process" --with-healthcheck
     expose:
       - "8080"
     environment:
@@ -129,12 +124,7 @@ services:
     platform: linux/amd64
     restart: on-failure
     command: |
-      uv run prefect worker start \
-      --name "process-worker-high" \
-      --pool "process-work-pool" \
-      --work-queue "high" \
-      --type "process" \
-      --with-healthcheck
+      uv run prefect worker start --name "process-worker-high" --pool "process-work-pool" --work-queue "high" --type "process" --with-healthcheck
     expose:
       - "8081"
     environment:
