@@ -37,7 +37,6 @@ This is my side project building a data platform with dataset WideWorldImporters
 - [x] Setup GCP BigQuery
 - [ ] Prefect deployment
   - [x] Configure Prefect docker infrastructure
-  - [ ] Secret management
   - [ ] Prefect deployment strategy
 - [ ] Build Prefect flows to push data from Postgres to BigQuery into raw layer
 - [ ] Data warehouse architecture and design

@@ -8,11 +8,27 @@ LABEL org.opencontainers.image.descripiton "Docker image for all-purpose prefect
 ENV PYTHONUNBUFFERED=1
 ENV UV_SYSTEM_PYTHON=1
 
-# Install curl and ca-certificates
+# Install curl, ca-certificates, gnupg2, git-core
 RUN apt-get update && apt-get install -y --no-install-recommends \
   curl=7.88.1-10+deb12u8 \
   ca-certificates=20230311 \
+  gnupg2 \
   git-core && \
+  rm -rf /var/lib/apt/lists/* && \
+  apt-get clean
+
+# Install 1Password CLI
+RUN curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+  gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg && \
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" | \
+  tee /etc/apt/sources.list.d/1password.list && \
+  mkdir -p /etc/debsig/policies/AC2D62742012EA22/ && \
+  curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol | \
+  tee /etc/debsig/policies/AC2D62742012EA22/1password.pol && \
+  mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22 && \
+  curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+  gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg && \
+  apt update && apt install 1password-cli && \
   rm -rf /var/lib/apt/lists/* && \
   apt-get clean
 
