@@ -1,7 +1,7 @@
 # This is the configuration file for Prefect.
 # For more information on configuration, see: https://docs.prefect.io/v3/develop/settings-ref
 
-home = "/app/.prefect"
+home = ".prefect"
 ui_url = "http://127.0.0.1:4200"
 
 [server]

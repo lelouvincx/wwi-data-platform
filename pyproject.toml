@@ -16,6 +16,7 @@ dependencies = [
   "dbt-extractor>=0.5.1",
   "psycopg2-binary>=2.9.10",
   "asyncpg>=0.30.0",
+  "prefect-docker>=0.6.2",
 ]
 
 [dependency-groups]

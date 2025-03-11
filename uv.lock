@@ -1862,6 +1862,20 @@ bigquery = [
 ]
 
 [[package]]
+name = "prefect-docker"
+version = "0.6.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "docker" },
+    { name = "exceptiongroup" },
+    { name = "prefect" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/77/fc/fcf64753a7b6373ad31669f0c0df928d51f8edbd3a6b56adbd1799153acf/prefect_docker-0.6.2.tar.gz", hash = "sha256:405cdf2b266c7e1ffcb61f5b80c710401bc2eb5f25dcbccc195b0e5c86f5a421", size = 33777 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4e/55/6f81b38f6190779904d02179a5589d5d5b84c7167fbd8d7c5827dd584083/prefect_docker-0.6.2-py3-none-any.whl", hash = "sha256:bae500ff0c18e3e1c55f2e79ec154bc1f8c8329fbe6a3726052dfb0fe38d7d4c", size = 23661 },
+]
+
+[[package]]
 name = "prefect-gcp"
 version = "0.6.2"
 source = { registry = "https://pypi.org/simple" }
@@ -3100,6 +3114,7 @@ dependencies = [
     { name = "dlt" },
     { name = "prefect" },
     { name = "prefect-dbt", extra = ["bigquery"] },
+    { name = "prefect-docker" },
     { name = "psycopg2-binary" },
 ]
 
@@ -3119,6 +3134,7 @@ requires-dist = [
     { name = "dlt", specifier = ">=1.7.0" },
     { name = "prefect", specifier = ">=3.2.7" },
     { name = "prefect-dbt", extras = ["bigquery"], specifier = ">=0.6.6" },
+    { name = "prefect-docker", specifier = ">=0.6.2" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
 ]
 

@@ -143,6 +143,35 @@ services:
       - ../../pipelines/:/app/pipelines
       - ../../dbt/:/app/dbt
 
+  prefect-worker-docker:
+    build:
+      context: ../../
+      dockerfile: Dockerfile
+    container_name: prefect-worker-docker
+    hostname: prefect-worker-docker
+    platform: linux/amd64
+    restart: on-failure
+    command: |
+      uv run prefect worker start --name "docker-worker" --pool "docker-work-pool" --work-queue "default" --type "docker" --with-healthcheck
+    expose:
+      - "8082"
+    environment:
+      PREFECT_API_URL: http://prefect-server:4200/api
+      PREFECT_SERVER_API_HOST: 0.0.0.0
+      PREFECT_LOGGING_LEVEL: INFO
+      PREFECT_WORKER_WEBSERVER_PORT: 8082
+    env_file:
+      - ../../.env
+    depends_on:
+      prefect-server:
+        condition: service_healthy
+    networks:
+      - data_network
+    volumes:
+      - ../../pipelines/:/app/pipelines
+      - ../../dbt/:/app/dbt
+      - /var/run/docker.sock:/var/run/docker.sock
+
   prometheus-prefect-exporter:
     image: prefecthq/prometheus-prefect-exporter:latest
     container_name: prometheus-prefect-exporter

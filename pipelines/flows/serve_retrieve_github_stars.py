@@ -1,4 +1,5 @@
 import httpx
+import time
 from prefect import flow, task
 
 
@@ -12,6 +13,7 @@ def get_stars_for_repo(repo: str) -> int:
 
 @task(log_prints=True)
 def print_stars(stars: int) -> None:
+    time.sleep(180)
     print(f"Total stars: {stars}")
 
 

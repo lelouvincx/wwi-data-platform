@@ -1,3 +1,4 @@
+import time
 from prefect import flow, task
 
 
@@ -8,6 +9,7 @@ def say_hello(name):
 
 @task(log_prints=True)
 def say_goodbye(name):
+    time.sleep(10)
     print(f"goodbye {name}")
 
 
