@@ -14,6 +14,7 @@ build:
   - prefect.deployments.steps.run_shell_script:
       id: dbt-commit-hash
       script: git -C dbt rev-parse --short HEAD
+      stream_output: true
 
 pull:
   - prefect.deployments.steps.set_working_directory:
@@ -35,7 +36,7 @@ deployments:
       job_variables: {}
     concurrency_limit:
     schedules:
-      - cron: "0 * * * *"
+      - cron: 0 * * * *
         timezone: UTC
         day_or: true
         active: false
@@ -45,13 +46,18 @@ deployments:
     tags:
       - greetings
     description: Say hello to the world
-    triggers: null
+    triggers:
     entrypoint: pipelines.flows.say_hello:greetings
     parameters:
-      names: ["Alice", "Bob", "Charlie"]
+      names:
+        - Alice
+        - Bob
+        - Charlie
     work_pool:
       name: process-work-pool
       work_queue_name: default
+      job_variables: {}
+    concurrency_limit:
     schedules:
       - cron: "* * * * *"
         timezone: UTC
