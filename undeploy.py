@@ -7,7 +7,7 @@ async def undeploy():
     client: PrefectClient = get_client()
     deployments = await client.read_deployments()
 
-    async for deployment in deployments:
+    for deployment in deployments:
         name = deployment.entrypoint.split(":")[-1]
         print(f"Deleting deployment {name}")
         await client.delete_deployment(str(deployment.id))

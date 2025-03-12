@@ -9,11 +9,11 @@ build:
   #     directory: "{{ get-cwd.stdout }}/{{ clone-step.directory }}"
   - prefect.deployments.steps.run_shell_script:
       id: prefect-commit-hash
-      script: git rev-parse --short HEAD
+      script: echo "getting prefect commit hash..." && git rev-parse --short HEAD
       stream_output: true
   - prefect.deployments.steps.run_shell_script:
       id: dbt-commit-hash
-      script: git -C dbt rev-parse --short HEAD
+      script: echo "getting dbt commit hash..." && git -C dbt rev-parse --short HEAD
       stream_output: true
 
 pull:
