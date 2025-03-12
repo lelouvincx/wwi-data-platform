@@ -174,3 +174,4 @@ cython_debug/
 
 wide_world_importers_pg.dump
 .envrc
+.prefect/
