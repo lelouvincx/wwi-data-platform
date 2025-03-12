@@ -17,6 +17,7 @@ dependencies = [
   "psycopg2-binary>=2.9.10",
   "asyncpg>=0.30.0",
   "prefect-docker>=0.6.2",
+  "asyncio>=3.4.3",
 ]
 
 [dependency-groups]
